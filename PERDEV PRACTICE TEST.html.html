@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Power of the Mind — 50-Item SHS Quiz</title>
+<style>
+:root{--ink:#20283a;--muted:#667085;--paper:#f5f7fb;--card:#fff;--line:#e3e8f0;--blue:#3157c8;--blue2:#eaf0ff;--green:#16804a;--greenbg:#e9f8ef;--red:#b42318;--redbg:#fff0ee}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(135deg,#172554,#3157c8);color:white;padding:32px 18px}
+.wrap{max-width:900px;margin:auto;padding:0 16px}h1{font-size:clamp(1.65rem,4vw,2.4rem);line-height:1.15;margin:0 0 10px}header p{margin:0;color:#e4eaff}
+main{padding:24px 0 48px}.intro,.quiz-card,.results{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 4px 18px #1b2a4410}
+.progress-row{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:.92rem;margin:16px 0 8px}
+.progress{height:9px;background:#e9edf5;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:var(--blue);transition:width .2s}
+.section-tag{display:inline-block;background:var(--blue2);color:#2547a5;padding:5px 10px;border-radius:99px;font-size:.78rem;font-weight:750;letter-spacing:.02em}
+h2{font-size:1.25rem;margin:12px 0 8px}.question{font-weight:700;font-size:1.08rem;margin:12px 0 16px}
+.options{display:grid;gap:10px}.option{width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);font:inherit;cursor:pointer;display:flex;gap:11px;align-items:flex-start;transition:.15s}
+.option:hover:not(:disabled){border-color:var(--blue);background:#f8faff}.letter{font-weight:800;color:var(--blue);min-width:24px}
+.option:disabled{cursor:default;opacity:1}.option.correct{border-color:var(--green);background:var(--greenbg)}.option.wrong{border-color:var(--red);background:var(--redbg)}
+.feedback{display:none;margin-top:14px;border-radius:12px;padding:14px;border:1px solid var(--line)}.feedback.show{display:block}.feedback.good{background:var(--greenbg);border-color:#b9e5ca}.feedback.bad{background:var(--redbg);border-color:#f2c2bc}
+.feedback strong{display:block;margin-bottom:4px}.explain{font-size:.95rem}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.btn{border:0;border-radius:10px;padding:11px 17px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#edf0f6;color:var(--ink)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.results{display:none}.results.show{display:block}.score{font-size:2.3rem;font-weight:850;color:var(--blue)}
+.small{color:var(--muted);font-size:.9rem}.review-item{padding:12px 0;border-top:1px solid var(--line)}.review-item b{display:block}.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 16px 28px}
+@media(max-width:540px){.intro,.quiz-card,.results{padding:16px}.controls .btn{flex:1}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>The Power of the Mind</h1>
+<p>50-item SHS multiple-choice practice quiz · 25 questions per reviewer PDF</p>
+</div></header>
+<main class="wrap">
+<section class="intro">
+<strong>How to take the quiz</strong>
+<ul>
+<li>Choose one answer (A–D) for each question.</li>
+<li>Your answer is checked immediately.</li>
+<li>If your answer is wrong, the quiz shows the correct answer and explains why your choice is incorrect.</li>
+<li>Complete all 50 questions to see your score and review your answers.</li>
+</ul>
+<div class="progress-row"><span id="progressText">Question 1 of 50</span><span id="scoreText">Correct: 0</span></div>
+<div class="progress"><div class="bar" id="progressBar"></div></div>
+</section>
+
+<section class="quiz-card" id="quizCard">
+<span class="section-tag" id="sectionTag">PDF 1 · Multiple Intelligences Review</span>
+<h2 id="counter">Question 1</h2>
+<div class="question" id="questionText"></div>
+<div class="options" id="options"></div>
+<div class="feedback" id="feedback" aria-live="polite"></div>
+<div class="controls">
+<button class="btn secondary" id="prevBtn">← Previous</button>
+<button class="btn primary" id="nextBtn" disabled>Next question →</button>
+<button class="btn secondary" id="finishBtn" style="display:none">See results</button>
+</div>
+<p class="small" id="answeredNote">Select an answer to continue.</p>
+</section>
+
+<section class="results" id="results">
+<h2>Quiz completed!</h2>
+<div class="score" id="finalScore"></div>
+<p id="resultMessage"></p>
+<div class="controls">
+<button class="btn primary" onclick="restartQuiz()">Retake quiz</button>
+<button class="btn secondary" onclick="showReview()">Review all answers</button>
+</div>
+<div id="review" class="hidden"></div>
+</section>
+</main>
+<footer>Study aid based on the two uploaded reviewer PDFs. Answer rationales follow the terminology and explanations in those materials.</footer>
+<script>
+const questions = [
+/* PDF 1 — Multiple Intelligences Review: 25 items */
+{section:1,q:"Which term refers to the mental activity in which the brain organizes, stores, communicates, or processes information?",a:["Cognition","Divergent thinking","Problem solving","Functional fixedness"],c:0,why:"Cognition is the mental activity involved in organizing, storing, communicating, or processing information. Divergent thinking generates many answers; problem solving aims at a goal; functional fixedness limits how an object is viewed."},
+{section:1,q:"According to the reviewer, how does short-term memory encode information?",a:["Through emotions and movements","Through sound and visual images","Through smell and taste only","Through trial and error"],c:1,why:"The reviewer says short-term memory encodes information as sound and visual images, which help form mental images. Trial and error belongs to mechanical problem-solving solutions."},
+{section:1,q:"A student identifies an apple as a typical example of a fruit because it closely matches the defining characteristics of the concept. What is this example called?",a:["Concept","Mental image","Prototype","Algorithm"],c:2,why:"A prototype closely matches the defining characteristics of a particular concept. A concept is the category itself, while an algorithm is a step-by-step procedure."},
+{section:1,q:"A learner tries different strategies to reach a specific goal. Which concept best describes this activity?",a:["Cognition","Problem solving","Functional fixedness","Mental imagery"],c:1,why:"Problem solving means thinking and behaving in certain ways to reach a goal. Cognition is the broader process of handling information."},
+{section:1,q:"A student refuses to use a ruler as a straightedge because they believe it should only be used for measuring. What barrier is demonstrated?",a:["Insight","Divergent thinking","Functional fixedness","Mechanical solution"],c:2,why:"Functional fixedness is the tendency to see an object as having only its original intended use, preventing the person from seeing other possible uses."},
+{section:1,q:"During brainstorming, students are encouraged to suggest as many different solutions as possible. Which type of thinking is used?",a:["Sequential thinking","Divergent thinking","Functional fixedness","Mechanical thinking"],c:1,why:"Divergent thinking means coming up with as many different answers as possible. It encourages multiple possible solutions."},
+{section:1,q:"A student follows a fixed sequence of instructions to solve a mathematical problem. Which problem-solving method is demonstrated?",a:["Insight","Heuristic","Mechanical solution","Algorithm"],c:3,why:"An algorithm uses step-by-step procedures for solving certain types of problems. A heuristic is a shortcut, while insight is a sudden realization."},
+{section:1,q:"A student uses a practical shortcut to narrow down possible answers instead of checking every possible solution. Which method is being used?",a:["Heuristic","Algorithm","Insight","Mechanical solution"],c:0,why:"A heuristic, or rule of thumb, narrows down the possible solutions for a problem. An algorithm follows specific steps."},
+{section:1,q:"After struggling with a puzzle, a student suddenly realizes the correct solution. Which method is demonstrated?",a:["Algorithm","Mechanical solution","Insight","Heuristic"],c:2,why:"Insight is the sudden perception of a solution—often described as an 'aha!' moment."},
+{section:1,q:"A student enjoys studying plants, animals, rocks, and features of the natural environment. Which intelligence is shown?",a:["Spatial","Naturalist","Interpersonal","Bodily-kinesthetic"],c:1,why:"Naturalist intelligence involves discriminating among living things and being sensitive to other features of the natural world."},
+{section:1,q:"A learner can easily recognize pitch, rhyme, timbre, and tone and enjoys composing songs. Which intelligence is strongest?",a:["Musical","Linguistic","Logical-mathematical","Spatial"],c:0,why:"Musical intelligence is the capacity to discern, recognize, create, reproduce, and reflect on music, including pitch, rhyme, timbre, and tone."},
+{section:1,q:"A student enjoys calculations, experiments, patterns, and identifying relationships between numbers. Which intelligence is demonstrated?",a:["Interpersonal","Naturalist","Logical-mathematical","Intra-personal"],c:2,why:"Logical-mathematical intelligence involves calculating, quantifying, considering hypotheses, recognizing relationships, and using sequential reasoning."},
+{section:1,q:"A person often reflects on questions such as 'What is the meaning of life?' and 'Why do humans die?' Which intelligence is involved?",a:["Existential","Linguistic","Musical","Spatial"],c:0,why:"Existential intelligence involves sensitivity and the capacity to tackle deep questions about human existence."},
+{section:1,q:"A class president understands classmates' feelings, communicates well, and works effectively with different people. Which intelligence is demonstrated?",a:["Intra-personal","Interpersonal","Naturalist","Bodily-kinesthetic"],c:1,why:"Interpersonal intelligence is the ability to understand and interact effectively with other people, including recognizing their moods and perspectives."},
+{section:1,q:"A surgeon uses precise hand movements and coordinates body actions while performing a procedure. Which intelligence is most directly involved?",a:["Spatial","Musical","Bodily-kinesthetic","Linguistic"],c:2,why:"Bodily-kinesthetic intelligence involves manipulating objects and using physical skills. The reviewer lists surgeons among examples."},
+{section:1,q:"A student enjoys writing poems, reading novels, telling stories, and solving crossword puzzles. Which intelligence is reflected?",a:["Linguistic","Logical-mathematical","Musical","Interpersonal"],c:0,why:"Linguistic intelligence involves thinking in words and using language to express and understand complex meanings."},
+{section:1,q:"A person understands their own thoughts and feelings and uses this understanding to plan their life. Which intelligence is shown?",a:["Interpersonal","Intra-personal","Existential","Naturalist"],c:1,why:"Intra-personal intelligence is the capacity to understand oneself—one's thoughts and feelings—and use that understanding in planning and directing life."},
+{section:1,q:"An architect mentally rotates objects, imagines buildings in three dimensions, and works with designs. Which intelligence is most relevant?",a:["Spatial","Musical","Linguistic","Naturalist"],c:0,why:"Spatial intelligence involves thinking in three dimensions, mental imagery, spatial reasoning, and image manipulation."},
+{section:1,q:"Who proposed the theory of Multiple Intelligences described in the reviewer?",a:["Wilhelm Wundt","Howard Gardner","Daniel Goleman","Jean Piaget"],c:1,why:"The reviewer identifies Howard Gardner as the proponent of Multiple Intelligences. It also explains that people can be intelligent in different ways."},
+{section:1,q:"Which statement best distinguishes interpersonal from intra-personal intelligence?",a:["Interpersonal concerns nature; intra-personal concerns music.","Interpersonal concerns other people; intra-personal concerns oneself.","Interpersonal concerns numbers; intra-personal concerns words.","They both refer only to physical skills."],c:1,why:"Interpersonal means understanding other people (people smart), while intra-personal means understanding oneself (self smart)."},
+{section:1,q:"A learner prefers exact information, numerical data, logical explanations, and analysis of facts. Which Herrmann brain quadrant best matches this preference?",a:["Quadrant A","Quadrant B","Quadrant C","Quadrant D"],c:0,why:"Quadrant A is upper-left and is described as logical, analytical, fact-based, and quantitative."},
+{section:1,q:"A student likes organizing ideas in sequence, planning tasks, and applying what was learned in practice. Which quadrant is described?",a:["Quadrant A","Quadrant B","Quadrant C","Quadrant D"],c:1,why:"Quadrant B is lower-left and is associated with organization, sequence, planning, and applying learning."},
+{section:1,q:"A learner enjoys group activities, sharing ideas, movement, and active participation. Which quadrant is most closely described?",a:["Quadrant A","Quadrant B","Quadrant C","Quadrant D"],c:2,why:"Quadrant C is lower-right and emphasizes interpersonal learning, group participation, feelings, and kinesthetic activity."},
+{section:1,q:"A student enjoys exploring, experimenting, discovering connections, and creating new concepts. Which quadrant is demonstrated?",a:["Quadrant A","Quadrant B","Quadrant C","Quadrant D"],c:3,why:"Quadrant D is upper-right and is holistic. It emphasizes curiosity, exploration, synthesizing, and creating new ideas."},
+{section:1,q:"According to the reviewer, which brain hemisphere is more associated with music, art, visual-spatial activities, and forming mental images?",a:["Left hemisphere","Right hemisphere","Both are described as exclusively verbal","Neither hemisphere"],c:1,why:"The reviewer associates the right hemisphere with music, art, visual-spatial and visual-motor activities, and forming mental images."},
+
+/* PDF 2 — Power of the Mind Reviewer: 25 items */
+{section:2,q:"According to the reviewer, what is Mind Power?",a:["A person's ability to avoid all problems","One of the strongest and most valuable powers a human person must possess","A skill used only by scientists","A physical exercise for the brain"],c:1,why:"The reviewer describes Mind Power as one of the strongest and most valuable powers a human person must possess."},
+{section:2,q:"According to the reviewer, what can the human brain create?",a:["Ideas and concepts","Only physical movements","Only memories of sounds","Only emotional reactions"],c:0,why:"The reviewer states that the human brain can create ideas and concepts, and that thoughts influence behavior, attitude, and actions."},
+{section:2,q:"What do thoughts influence, according to the Mind Power notes?",a:["Only a person's height","Behavior, attitude, and actions","Only the body's temperature","The number of neurons"],c:1,why:"The notes explain that thoughts influence behavior and attitude and help control a person's actions."},
+{section:2,q:"What are neurons?",a:["Brain hormones","Nerve cells","Blood vessels","Muscle fibers"],c:1,why:"The reviewer directly defines neurons as nerve cells."},
+{section:2,q:"According to Chopra and Tanzi (2012), approximately how many nerve cells does the brain have?",a:["100 million","1 billion","100 billion","1 quadrillion"],c:2,why:"The reviewer gives an estimate of roughly 100 billion nerve cells. It separately describes the much larger number of synaptic connections."},
+{section:2,q:"What are synapses, as described in the reviewer?",a:["Connections between nerve cells","Protective layers around the skull","Types of brain injuries","Muscles responsible for movement"],c:0,why:"Synapses are the connections formed among nerve cells. The reviewer estimates these connections at around a trillion to perhaps a quadrillion."},
+{section:2,q:"Which statement matches the reviewer's description of the left-brain hemisphere?",a:["It is associated with linear thinking and coordinates the right side of the body.","It is associated with artistic thinking and coordinates the left side of the body.","It controls only emotions and intuition.","It has no role in reasoning or communication."],c:0,why:"The reviewer describes the left brain as linear, associated with reasoning and communication, and controlling the right side of the body."},
+{section:2,q:"Which set of abilities is associated with the right brain in the reviewer?",a:["Grammar, computation, and time awareness","Creativity, intuition, and imagination","Speech sequencing and verbal memory only","Logical analysis and numerical calculation only"],c:1,why:"The reviewer associates the right brain with artistic functions, creativity, intuition, and imagination."},
+{section:2,q:"A student is skilled in speaking, reading, writing, grammar, computation, and reasoning. Which dominance does the reviewer associate with these skills?",a:["Right-brain dominance","Left-brain dominance","Neither hemisphere","Both hemispheres are excluded"],c:1,why:"The list of left-brain-dominant skills includes speaking, reading, writing, listening, grammar, number skills, computation, analysis, reasoning, and time awareness."},
+{section:2,q:"A learner is good at recognizing faces, interpreting visual information, noticing motion, and appreciating music and art. Which dominance is associated with these abilities?",a:["Left-brain dominance","Right-brain dominance","Only motor dominance","Neither hemisphere"],c:1,why:"The reviewer places face recognition, visual information, motion detection, music, art, intuition, and imagination under right-brain dominance."},
+{section:2,q:"Which side of the body is coordinated by the right brain, according to the reviewer?",a:["Right side","Left side","Both sides exclusively","Neither side"],c:1,why:"The reviewer emphasizes the opposite-side relationship: the right brain coordinates the left side of the body."},
+{section:2,q:"An injury on the left side of the brain may cause difficulty understanding and expressing which type of information?",a:["Spoken and written language","Art and music only","Visual motion only","Body balance only"],c:0,why:"The reviewer lists difficulty understanding and expressing spoken and written language as a possible effect of left-side brain injury."},
+{section:2,q:"Which problem is listed as a possible result of injury to the left side of the brain?",a:["Decreased awareness of art and music","Impaired logic and sequencing difficulties","Only reduced attention to faces","Loss of all physical movement"],c:1,why:"The reviewer lists impaired logic and sequencing difficulties among possible effects of left-side brain injury."},
+{section:2,q:"Which effect is associated with injury to the right side of the brain in the reviewer?",a:["Difficulty with grammar only","Impaired speech production only","Decreased awareness of art and music","Loss of all number skills"],c:2,why:"The reviewer lists decreased awareness of art and music as a possible effect of right-side brain injury. It also mentions attention and memory issues."},
+{section:2,q:"What is mindfulness, according to Davis and Haynes (2011) in the reviewer?",a:["Thinking about the future without stopping","Moment-to-moment awareness of one's experience without judgment","Avoiding all emotions and thoughts","Memorizing every event in detail"],c:1,why:"The reviewer defines mindfulness as moment-to-moment awareness of one's experience without judgment."},
+{section:2,q:"Which group contains the three psychotherapeutic techniques listed as making good use of mindfulness?",a:["CBT, ACT, and DBT","MRI, EEG, and CT","IQ, EQ, and SQ","DNA, RNA, and ATP"],c:0,why:"The reviewer lists CBT (Cognitive Behavioral Therapy), ACT (Acceptance and Commitment Therapy), and DBT (Dialectical Behavioral Therapy)."},
+{section:2,q:"Which term is expanded as Cognitive Behavioral Therapy?",a:["ACT","DBT","CBT","CT"],c:2,why:"CBT stands for Cognitive Behavioral Therapy. ACT and DBT have different expansions in the reviewer."},
+{section:2,q:"Which benefit of mindfulness is identified in the reviewer?",a:["Increased anxiety and stress","Reduced anxiety and stress","Guaranteed elimination of all illness","Permanent removal of every negative thought"],c:1,why:"The reviewer cites research reporting reduced anxiety, stress, and symptoms of mood disorders. It does not claim mindfulness eliminates all illness."},
+{section:2,q:"Which physical-health benefit is mentioned in the Mindfulness section?",a:["Improved immune functioning and cardiovascular health","Guaranteed prevention of every infection","Increased blood pressure in all people","Elimination of the need for sleep"],c:0,why:"The reviewer identifies improved immune functioning and improved cardiovascular health as possible physical-health benefits."},
+{section:2,q:"According to the reviewer, regular mindfulness practice may contribute to improvements in which areas?",a:["Emotional regulation, concentration, and cognitive processing speed","Height, eyesight, and hearing","Muscle size, reflexes, and bone length","Only long-term factual memory"],c:0,why:"The reviewer says regular practice changes how the brain functions in ways that contribute to emotional regulation, concentration, and cognitive processing speed."},
+{section:2,q:"Who is credited in the reviewer with describing the brain's ability to let the human intellect flourish by guiding behavior and thoughts?",a:["Davis (2011)","Feldman (2008)","Howard Gardner (1989)","Franklin D. Roosevelt"],c:1,why:"The reviewer attributes this point to Feldman (2008). Davis and Haynes (2011) are cited for the definition of mindfulness."},
+{section:2,q:"Which author pair is associated with the estimate of roughly 100 billion nerve cells and a trillion to perhaps a quadrillion synapses?",a:["Grossman and Walach","Davis and Haynes","Chopra and Tanzi","Hoffmann and Sawyer"],c:2,why:"The reviewer attributes the estimate of nerve cells and synaptic connections to Chopra and Tanzi (2012)."},
+{section:2,q:"Which statement best reflects the reviewer's explanation of the relationship between the brain and the body?",a:["Thinking and motor skills are connected to the brain.","The brain controls only language.","The brain works independently from all body functions.","Motor skills are unrelated to brain activity."],c:0,why:"The reviewer says body functions, including thinking and motor skills, are interconnected with the human brain."},
+{section:2,q:"A person pauses to notice their thoughts and feelings in the present moment without judging them. Which practice does this describe?",a:["Functional fixedness","Mindfulness","Divergent thinking","Synaptic pruning"],c:1,why:"Mindfulness involves present, moment-to-moment awareness of one's experience without judgment."},
+{section:2,q:"Which statement is the central takeaway of the reviewer?",a:["People have no control over their actions.","The mind has no influence on behavior.","Conscious control is ours, and the brain can be inspired to achieve.","Only people with artistic ability can develop their minds."],c:2,why:"The reviewer's big takeaway emphasizes conscious control and the potential of the brain to achieve. It does not present people as powerless over their actions."}
+];
+
+let current=0, answers=Array(questions.length).fill(null), locked=Array(questions.length).fill(false);
+const $=id=>document.getElementById(id);
+function render(){
+ const item=questions[current], sectionName=item.section===1?"PDF 1 · Multiple Intelligences Review":"PDF 2 · Power of the Mind Reviewer";
+ $("sectionTag").textContent=sectionName;
+ $("counter").textContent=`Question ${current+1}`;
+ $("questionText").textContent=item.q;
+ $("progressText").textContent=`Question ${current+1} of ${questions.length}`;
+ $("scoreText").textContent=`Correct: ${answers.filter((v,i)=>v===questions[i].c).length}`;
+ $("progressBar").style.width=`${(current/questions.length)*100}%`;
+ $("options").innerHTML="";
+ item.a.forEach((label,i)=>{
+  const b=document.createElement("button");b.className="option";b.type="button";
+  b.innerHTML=`<span class="letter">${"ABCD"[i]}.</span><span></span>`;b.querySelector("span:last-child").textContent=label;
+  if(locked[current]){b.disabled=true;if(i===item.c)b.classList.add("correct");if(i===answers[current]&&i!==item.c)b.classList.add("wrong")}
+  else b.addEventListener("click",()=>selectAnswer(i));
+  $("options").appendChild(b);
+ });
+ const fb=$("feedback");fb.className="feedback";
+ if(locked[current]){
+  const correct=answers[current]===item.c;fb.classList.add("show",correct?"good":"bad");
+  fb.innerHTML=`<strong>${correct?"Correct!":"Not quite. The correct answer is "+ "ABCD"[item.c]+". "+item.a[item.c]}</strong><div class="explain"></div>`;
+  fb.querySelector(".explain").textContent=correct?item.why:`Your answer: ${"ABCD"[answers[current]]}. ${item.a[answers[current]]}. ${item.why}`;
+ }
+ $("prevBtn").disabled=current===0;
+ $("nextBtn").disabled=!locked[current];
+ $("nextBtn").style.display=current===questions.length-1?"none":"inline-block";
+ $("finishBtn").style.display=current===questions.length-1&&locked[current]?"inline-block":"none";
+ $("answeredNote").textContent=locked[current]?"Your answer has been recorded.":"Select an answer to continue.";
+}
+function selectAnswer(i){if(locked[current])return;answers[current]=i;locked[current]=true;render()}
+$("prevBtn").addEventListener("click",()=>{if(current>0){current--;render()}});
+$("nextBtn").addEventListener("click",()=>{if(current<questions.length-1){current++;render()}});
+$("finishBtn").addEventListener("click",showResults);
+function showResults(){
+ $("quizCard").classList.add("hidden");$("results").classList.add("show");
+ const score=answers.filter((v,i)=>v===questions[i].c).length;
+ $("finalScore").textContent=`${score} / ${questions.length}`;
+ $("progressBar").style.width="100%";
+ $("resultMessage").textContent=score>=45?"Excellent work! You have a strong understanding of the reviewers.":score>=35?"Good job! Review the explanations for the items you missed.":score>=25?"You're making progress. Study the rationales and try again.":"Keep practicing. Read each rationale, revisit the reviewers, and retake the quiz.";
+}
+function showReview(){
+ const box=$("review");box.classList.toggle("hidden");
+ if(!box.dataset.ready){
+  box.innerHTML="<h3>Answer review</h3>";
+  questions.forEach((q,i)=>{
+   const div=document.createElement("div");div.className="review-item";
+   const title=document.createElement("b");title.textContent=`${i+1}. ${q.q}`;
+   const result=document.createElement("p");result.className="small";
+   result.textContent=`Your answer: ${answers[i]===null?"Not answered":("ABCD"[answers[i]]+". "+q.a[answers[i]])} · Correct answer: ${"ABCD"[q.c]+". "+q.a[q.c]}`;
+   const why=document.createElement("p");why.textContent=q.why;
+   div.append(title,result,why);box.appendChild(div);
+  });box.dataset.ready="1";
+ }
+}
+function restartQuiz(){current=0;answers=Array(questions.length).fill(null);locked=Array(questions.length).fill(false);$("results").classList.remove("show");$("review").classList.add("hidden");$("review").innerHTML="";$("review").dataset.ready="";$("quizCard").classList.remove("hidden");render();window.scrollTo({top:0,behavior:"smooth"})}
+render();
+</script>
+</body>
+</html>
